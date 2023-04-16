@@ -29,7 +29,7 @@ const userSchema = new Schema({
       min: [4, 'Too short, min 4 characters are required'],
       max: [32, 'Too long, max 16 characters are required']
     }
-  });
+  },{timestamps: true});
   
   userSchema.pre('save', function (next) {
     const user = this
