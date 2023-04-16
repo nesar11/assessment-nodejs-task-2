@@ -69,6 +69,51 @@ exports.login = function (req, res) {
 }
 
 
+exports.createUser = function (req, res) {
+  const { username, email, password, passwordConfirmation } = req.body
+  if (!email || !password) {
+    return res.status(422).json({ 'error': 'Please provide email or password' })
+  }
+
+  if (password != passwordConfirmation) {
+    return res.status(422).json({ 'error': 'Password does not match' })
+  }
+  User.findOne({ email }, function (err, existingUser) {
+    if (err) {
+      return res.status(422).json({ 'error': 'Oops! Something went Wrong' })
+    }
+    if (existingUser) {
+      return res.status(422).json({ 'error': 'User already exists' })
+    }
+    else {
+      const user = new User({
+        username, email, password
+      })
+
+      user.save(function (err) {
+        if (err) {
+          return res.status(422).json({
+            'error': 'Oops! Something went wrong'
+          })
+        }
+        return res.status(200).json({ 'registered': true })
+      })
+    }
+  })
+ }
+
+ exports.newUser = async (req, res) => {
+  const newUser = new User(req.body);
+
+  try {
+    const savedUser = await newUser.save();
+    res.status(200).json(savedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
 
 exports.authMiddleware = function (req, res, next) {
   const json_token = req.headers.authorization
